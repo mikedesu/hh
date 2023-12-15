@@ -53,13 +53,21 @@ func doRequest(host string) {
 
 func main() {
     var inputFilename string
+    var maxJobs int
     flag.StringVar(&inputFilename, "f", "", "input file name")
     flag.StringVar(&hostRoot, "h", "yoururl.com", "collaborator or interactsh host")
+    flag.IntVar(&maxJobs, "j", 8, "max jobs")
     flag.Parse()
     // check input file
     if inputFilename == "" {
         fmt.Fprintln(os.Stderr, "input file name is required")
         // print usage
+        flag.Usage()
+        os.Exit(1)
+    }
+    // make sure job count is not negative
+    if maxJobs < 0 {
+        fmt.Fprintln(os.Stderr, "max jobs must be greater than 0")
         flag.Usage()
         os.Exit(1)
     }
@@ -79,7 +87,6 @@ func main() {
         fmt.Fprintln(os.Stderr, "scanner error: ", err)
         os.Exit(1)
     }
-    maxJobs := 8
     currentJobs := 0
     rand.Shuffle(len(hostList), func(i, j int) { hostList[i], hostList[j] = hostList[j], hostList[i] })
     for _, host := range hostList {
